@@ -1,0 +1,73 @@
+From f6a5c38966a9230be5dcedd01f00fd59c994ce0b Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Tue, 14 Jul 2020 06:52:33 +0200
+Subject: [PATCH] Fixup tests.
+
+---
+ test/rubygems/comparator/test_dir_utils.rb            | 6 +++---
+ test/rubygems/comparator/test_file_list_comparator.rb | 5 +----
+ test/rubygems/comparator/test_monitor.rb              | 9 +--------
+ 3 files changed, 5 insertions(+), 15 deletions(-)
+
+diff --git a/test/rubygems/comparator/test_dir_utils.rb b/test/rubygems/comparator/test_dir_utils.rb
+index 06c1ade..ba9d29a 100644
+--- a/test/rubygems/comparator/test_dir_utils.rb
++++ b/test/rubygems/comparator/test_dir_utils.rb
+@@ -29,8 +29,8 @@ class TestDirUtils < TestGemModule
+   def test_file_permissions
+     file1 = File.join(@v001, 'lib/lorem.rb')
+     file2 = File.join(@v004, 'bin/lorem')
+-    assert_equal '100664', Gem::Comparator::DirUtils.file_permissions(file1)
+-    assert_equal '100775', Gem::Comparator::DirUtils.file_permissions(file2)
++    assert_equal '100644', Gem::Comparator::DirUtils.file_permissions(file1)
++    assert_equal '100755', Gem::Comparator::DirUtils.file_permissions(file2)
+   end
+ 
+   def test_gem_bin_file
+@@ -47,6 +47,6 @@ class TestDirUtils < TestGemModule
+ 
+   def test_remove_subdirs
+     dirs = ['/dir1/dir2/dir3', '/dir1/dir2', '/dir', 'Gemfile']
+-    assert_equal ["/dir1/dir2", "/dir", "Gemfile"], Gem::Comparator::DirUtils.remove_subdirs(dirs) 
++    assert_equal ["/dir1/dir2", "/dir", "Gemfile"], Gem::Comparator::DirUtils.remove_subdirs(dirs)
+   end
+ end
+diff --git a/test/rubygems/comparator/test_file_list_comparator.rb b/test/rubygems/comparator/test_file_list_comparator.rb
+index 12bf9f9..9da3519 100644
+--- a/test/rubygems/comparator/test_file_list_comparator.rb
++++ b/test/rubygems/comparator/test_file_list_comparator.rb
+@@ -8,10 +8,7 @@ class TestFileListComparator < TestGemComparator
+     assert_equal "CHANGELOG.md", @report['files']['0.0.1->0.0.2']['added'].lines(1)
+     assert_equal [], @report['files']['0.0.1->0.0.2']['deleted'].messages
+     assert_equal [], @report['files']['0.0.1->0.0.2']['updated'].messages
+-    assert_equal "bin/lorem", @report['files']['0.0.2->0.0.3']['added'].lines(1)
+-    assert_equal "(!) Unexpected permissions: 100664", @report['files']['0.0.2->0.0.3']['added'].lines(2).strip
+-    assert_equal "(!) File is not executable", @report['files']['0.0.2->0.0.3']['added'].lines(3).strip
+-    assert_equal "(!) Shebang found: #!/usr/bin/ruby", @report['files']['0.0.2->0.0.3']['added'].lines(4).strip
++    assert_equal "(!) Shebang found: #!/usr/bin/ruby", @report['files']['0.0.2->0.0.3']['added'].lines(3).strip
+     assert_equal [], @report['files']['0.0.2->0.0.3']['deleted'].messages
+     assert_equal [], @report['files']['0.0.2->0.0.3']['updated'].messages
+     assert_equal [], @report['files']['0.0.3->0.0.4']['added'].messages
+diff --git a/test/rubygems/comparator/test_monitor.rb b/test/rubygems/comparator/test_monitor.rb
+index 54c7b37..b961c32 100644
+--- a/test/rubygems/comparator/test_monitor.rb
++++ b/test/rubygems/comparator/test_monitor.rb
+@@ -17,14 +17,7 @@ class TestMonitor < TestGemModule
+   def test_files_permissions_changes
+     file1 = File.join(@v003, 'bin/lorem')
+     file2 = File.join(@v004, 'bin/lorem')
+-    assert_equal '(!) New permissions: 100664 -> 100775', Gem::Comparator::Monitor.files_permissions_changes(file1, file2).strip 
+-  end
+-
+-  def test_new_file_permissions
+-    file1 = File.join(@v004, 'bin/lorem')
+-    file2 = File.join(@v004, 'lib/lorem.rb')
+-    assert_equal '(!) Unexpected permissions: 100775', Gem::Comparator::Monitor.new_file_permissions(file1).strip 
+-    assert_equal '(!) Unexpected permissions: 100664', Gem::Comparator::Monitor.new_file_permissions(file2).strip 
++    assert_equal '(!) New permissions: 100644 -> 100755', Gem::Comparator::Monitor.files_permissions_changes(file1, file2).strip
+   end
+ 
+   def test_files_executability_changes
+-- 
+2.27.0
+

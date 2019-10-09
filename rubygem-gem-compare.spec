@@ -8,9 +8,24 @@ Summary: RubyGems plugin for comparing gem versions
 License: MIT
 URL: https://github.com/fedora-ruby/gem-compare
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# gemfiles folder is not included
+# https://github.com/fedora-ruby/gem-compare/pull/19
+# git clone git@github.com:fedora-ruby/gem-compare.git --no-checkout
+# cd gem-compare && git archive -v -o gem-compare-0.0.7-gemfiles.txz v0.0.7 test/gemfiles
+Source1: %{gem_name}-%{version}-gemfiles.txz
+Patch0: 0001-Fixup-tests.patch
+
+# Due to internal resolver requirement in Ruby 2.6
+Requires: rubygem(bundler)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel >= 2.0.0
 BuildRequires: ruby >= 2.0.0
+BuildRequires: rubygem(bundler)
+BuildRequires: rubygem(rainbow)
+BuildRequires: rubygem(curb)
+BuildRequires: rubygem(diffy)
+BuildRequires: rubygem(gemnasium-parser)
+BuildRequires: rubygem(minitest)
 BuildArch: noarch
 
 %description
@@ -28,7 +43,9 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%setup -q -n %{gem_name}-%{version} -b1
+
+%patch0 -p1
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -41,6 +58,8 @@ cp -a .%{gem_dir}/* \
 
 %check
 pushd .%{gem_instdir}
+
+ln -s {%{_builddir}/,}test/gemfiles
 ruby -Itest:lib -e 'Dir.glob "./test/**/test_*.rb", &method(:require)'
 popd
 
@@ -50,6 +69,7 @@ popd
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
+%{gem_plugin}
 
 %files doc
 %doc %{gem_docdir}
