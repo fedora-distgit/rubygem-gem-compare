@@ -3,7 +3,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.0.7
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 Summary: RubyGems plugin for comparing gem versions
 License: MIT
 URL: https://github.com/fedora-ruby/gem-compare
